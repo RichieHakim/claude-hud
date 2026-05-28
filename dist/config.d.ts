@@ -12,7 +12,7 @@ export type GitBranchOverflowMode = 'truncate' | 'wrap';
  *   short:   Strip context suffix AND "Claude " prefix (e.g. "Opus 4.6")
  */
 export type ModelFormatMode = 'full' | 'compact' | 'short';
-export type TimeFormatMode = 'relative' | 'absolute' | 'both';
+export type TimeFormatMode = 'relative' | 'absolute' | 'both' | 'elapsed' | 'elapsedAndAbsolute';
 export type HudElement = 'project' | 'addedDirs' | 'context' | 'usage' | 'promptCache' | 'memory' | 'environment' | 'tools' | 'agents' | 'todos' | 'sessionTime';
 export type AddedDirsLayout = 'inline' | 'line';
 export type HudColorName = 'dim' | 'red' | 'green' | 'yellow' | 'magenta' | 'cyan' | 'brightBlue' | 'brightMagenta';
@@ -70,6 +70,8 @@ export interface HudConfig {
         showResetLabel: boolean;
         usageCompact: boolean;
         showTools: boolean;
+        toolNameMaxLength: number;
+        toolsMaxVisible: number;
         showAgents: boolean;
         showTodos: boolean;
         showSessionName: boolean;

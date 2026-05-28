@@ -54,6 +54,8 @@ export const DEFAULT_CONFIG = {
         showResetLabel: true,
         usageCompact: false,
         showTools: false,
+        toolNameMaxLength: 0,
+        toolsMaxVisible: 4,
         showAgents: false,
         showTodos: false,
         showSessionName: false,
@@ -125,7 +127,11 @@ function validateModelFormat(value) {
     return value === 'full' || value === 'compact' || value === 'short';
 }
 function validateTimeFormat(value) {
-    return value === 'relative' || value === 'absolute' || value === 'both';
+    return value === 'relative'
+        || value === 'absolute'
+        || value === 'both'
+        || value === 'elapsed'
+        || value === 'elapsedAndAbsolute';
 }
 function validateColorName(value) {
     return value === 'dim'
@@ -268,6 +274,12 @@ function validateDurationSeconds(value, fallback) {
     }
     return Math.floor(value);
 }
+function validateNonNegativeInteger(value, fallback) {
+    if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) {
+        return fallback;
+    }
+    return value;
+}
 function validateOptionalPath(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
@@ -370,6 +382,8 @@ export function mergeConfig(userConfig) {
         showTools: typeof migrated.display?.showTools === 'boolean'
             ? migrated.display.showTools
             : DEFAULT_CONFIG.display.showTools,
+        toolNameMaxLength: validateNonNegativeInteger(migrated.display?.toolNameMaxLength, DEFAULT_CONFIG.display.toolNameMaxLength),
+        toolsMaxVisible: validateNonNegativeInteger(migrated.display?.toolsMaxVisible, DEFAULT_CONFIG.display.toolsMaxVisible),
         showAgents: typeof migrated.display?.showAgents === 'boolean'
             ? migrated.display.showAgents
             : DEFAULT_CONFIG.display.showAgents,
