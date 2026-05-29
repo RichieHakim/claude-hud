@@ -8,6 +8,10 @@ export interface StdinData {
     id?: string;
     display_name?: string;
   };
+  // Claude Code 2.1.115+ exposes the current reasoning effort as an object,
+  // e.g. { level: "high" }. Older builds may send a bare string; absent when
+  // the model does not support the effort parameter.
+  effort?: string | { level?: string | null; [key: string]: unknown } | null;
   context_window?: {
     context_window_size?: number;
     current_usage?: {
@@ -106,4 +110,6 @@ export interface RenderContext {
   extraLabel: string | null;
   outputStyle?: string;
   claudeCodeVersion?: string;
+  effortLevel?: string;
+  effortSymbol?: string;
 }

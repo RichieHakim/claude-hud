@@ -86,6 +86,22 @@ export function label(text, colors) {
 export function custom(text, colors) {
     return withOverride(text, colors?.custom, CLAUDE_ORANGE);
 }
+/**
+ * Color the reasoning-effort level by intensity:
+ * low → dim, medium → cyan, high → green, xhigh → yellow,
+ * max → magenta, ultra → bright magenta. Unknown levels fall back to cyan.
+ */
+export function effort(level) {
+    const l = level.toLowerCase();
+    const color = l === 'low' ? DIM :
+        l === 'medium' ? CYAN :
+            l === 'high' ? GREEN :
+                l === 'xhigh' ? YELLOW :
+                    l === 'max' ? MAGENTA :
+                        l === 'ultra' ? BRIGHT_MAGENTA :
+                            CYAN;
+    return colorize(level, color);
+}
 export function warning(text, colors) {
     return colorize(text, resolveAnsi(colors?.warning, YELLOW));
 }

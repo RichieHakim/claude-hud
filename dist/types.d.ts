@@ -7,6 +7,10 @@ export interface StdinData {
         id?: string;
         display_name?: string;
     };
+    effort?: string | {
+        level?: string | null;
+        [key: string]: unknown;
+    } | null;
     context_window?: {
         context_window_size?: number;
         current_usage?: {
@@ -93,5 +97,7 @@ export interface RenderContext {
     extraLabel: string | null;
     outputStyle?: string;
     claudeCodeVersion?: string;
+    effortLevel?: string;
+    effortSymbol?: string;
 }
 //# sourceMappingURL=types.d.ts.map

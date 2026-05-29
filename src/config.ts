@@ -88,6 +88,7 @@ export interface HudConfig {
     showAgents: boolean;
     showTodos: boolean;
     showSessionName: boolean;
+    showEffortLevel: boolean;
     showClaudeCodeVersion: boolean;
     showMemoryUsage: boolean;
     showSessionTokens: boolean;
@@ -133,6 +134,7 @@ export const DEFAULT_CONFIG: HudConfig = {
     showAgents: false,
     showTodos: false,
     showSessionName: false,
+    showEffortLevel: false,
     showClaudeCodeVersion: false,
     showMemoryUsage: false,
     showSessionTokens: false,
@@ -338,6 +340,9 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     showSpeed: typeof migrated.display?.showSpeed === 'boolean'
       ? migrated.display.showSpeed
       : DEFAULT_CONFIG.display.showSpeed,
+    showEffortLevel: typeof migrated.display?.showEffortLevel === 'boolean'
+      ? migrated.display.showEffortLevel
+      : DEFAULT_CONFIG.display.showEffortLevel,
     showTokenBreakdown: typeof migrated.display?.showTokenBreakdown === 'boolean'
       ? migrated.display.showTokenBreakdown
       : DEFAULT_CONFIG.display.showTokenBreakdown,

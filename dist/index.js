@@ -7,6 +7,7 @@ import { loadConfig } from "./config.js";
 import { parseExtraCmdArg, runExtraCmd } from "./extra-cmd.js";
 import { getClaudeCodeVersion } from "./version.js";
 import { getMemoryUsage } from "./memory.js";
+import { resolveEffortLevel } from "./effort.js";
 import { setLanguage, t } from "./i18n/index.js";
 import { fileURLToPath } from "node:url";
 import { realpathSync } from "node:fs";
@@ -62,6 +63,9 @@ export async function main(overrides = {}) {
         const memoryUsage = config.display.showMemoryUsage && config.lineLayout === "expanded"
             ? await deps.getMemoryUsage()
             : null;
+        const effortInfo = config.display.showEffortLevel
+            ? resolveEffortLevel(stdin.effort)
+            : null;
         const ctx = {
             stdin,
             transcript,
@@ -77,6 +81,8 @@ export async function main(overrides = {}) {
             extraLabel,
             outputStyle,
             claudeCodeVersion,
+            effortLevel: effortInfo?.level,
+            effortSymbol: effortInfo?.symbol,
         };
         deps.render(ctx);
     }

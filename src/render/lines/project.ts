@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import type { RenderContext } from '../../types.js';
 import { getModelName, formatModelName, getProviderLabel } from '../../stdin.js';
 import { getOutputSpeed } from '../../speed-tracker.js';
-import { git as gitColor, gitBranch as gitBranchColor, warning as warningColor, critical as criticalColor, label, model as modelColor, project as projectColor, red, green, yellow, dim, custom as customColor } from '../colors.js';
+import { git as gitColor, gitBranch as gitBranchColor, warning as warningColor, critical as criticalColor, label, model as modelColor, project as projectColor, red, green, yellow, dim, custom as customColor, effort as effortColor } from '../colors.js';
 import { t } from '../../i18n/index.js';
 import { renderCostEstimate } from './cost.js';
 
@@ -23,7 +23,11 @@ export function renderProjectLine(ctx: RenderContext): string | null {
     const providerLabel = getProviderLabel(ctx.stdin);
     const modelQualifier = providerLabel ?? undefined;
     const modelDisplay = modelQualifier ? `${model} | ${modelQualifier}` : model;
-    parts.push(modelColor(`[${modelDisplay}]`, colors));
+    let modelSegment = modelColor(`[${modelDisplay}]`, colors);
+    if (ctx.effortLevel) {
+      modelSegment += ` ${dim('·')} ${effortColor(ctx.effortLevel)}`;
+    }
+    parts.push(`${label('Model', colors)} ${modelSegment}`);
   }
 
   let projectPart: string | null = null;
