@@ -1275,6 +1275,16 @@ test('renderTodosLine truncates long todo content', () => {
   assert.ok(line?.includes('...'));
 });
 
+test('renderTodosLine tolerates missing in-progress todo content', () => {
+  const ctx = baseContext();
+  ctx.transcript.todos = [
+    { status: 'in_progress' },
+  ];
+
+  assert.doesNotThrow(() => renderTodosLine(ctx));
+  assert.ok(renderTodosLine(ctx)?.includes('(0/1)'));
+});
+
 test('renderTodosLine returns null when no todos exist', () => {
   const ctx = baseContext();
   assert.equal(renderTodosLine(ctx), null);
