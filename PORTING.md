@@ -1,13 +1,14 @@
 # Porting this fork (RichieHakim/claude-hud)
 
-This fork = upstream **v0.3.0** + **one commit** that adds a stacked "hamburger"
-usage bar (`display.usageStackedBar`). The customization lives on the branch
-**`feat/stacked-usage-bar`**. `main` is left mirroring upstream so
-`git pull upstream main` stays trivial.
+This fork's **`main`** = upstream **v0.3.0** + **one commit** that adds a stacked
+"hamburger" usage bar (`display.usageStackedBar`). Because the customization lives
+on `main`, a plain `git clone` is ready to use — no branch checkout needed.
 
-> The old `feat/model-effort-display` branch is retired: upstream now ships the
-> reasoning-effort display natively (`display.showEffortLevel`, shown as
-> `[Fable 5 ◑ high]`), so that customization is no longer carried here.
+Upstream is tracked via the `upstream` remote (`jarrodwatts/claude-hud`); see
+"Updating later" below. There is no separate upstream-mirror branch.
+
+> The reasoning-effort display (`[Fable 5 ◑ high]`) is now **upstream-native**
+> (`display.showEffortLevel`), so it is no longer a customization carried here.
 
 ## What makes the HUD "mine" (only two things)
 
@@ -26,12 +27,9 @@ marketplace plugin; we edit `config.json` directly instead.)
 Prereqs: `git`, Node ≥ 18 (`node -v`), Claude Code installed.
 
 ```bash
-# 1. Clone the fork and check out the customization branch
+# 1. Clone the fork (default branch `main` already has the customization + built dist/)
 git clone https://github.com/RichieHakim/claude-hud.git ~/github_repos/claude-hud
-cd ~/github_repos/claude-hud
-git checkout feat/stacked-usage-bar
-#   dist/ is already built — nothing to compile.
-#   (To rebuild after editing src/:  npm install && npm run build)
+#   (To rebuild after editing src/:  cd ~/github_repos/claude-hud && npm install && npm run build)
 
 # 2. Drop in the config
 mkdir -p ~/.claude/plugins/claude-hud
@@ -98,10 +96,9 @@ teal bottom, you're spending quota faster than the window's clock — pace down.
 
 ```bash
 git fetch upstream --tags
-git checkout main && git merge --ff-only upstream/main   # keep main mirroring upstream
-git checkout feat/stacked-usage-bar
-git rebase <newest upstream tag, e.g. v0.4.0>            # resolve small render conflicts
-npm install && npm run build                            # recommit dist
+git rebase <newest upstream tag, e.g. v0.4.0>   # on main; resolve small render conflicts
+npm install && npm run build                    # recommit dist
+git push origin main                            # (--force-with-lease, since rebase rewrites history)
 ```
 
 The customization is small and self-contained: `src/render/colors.ts` (the
