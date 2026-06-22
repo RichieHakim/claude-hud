@@ -129,10 +129,13 @@ export function coloredBar(percent, width = 10, colors, thresholds) {
     return `${color}${filledChar.repeat(filled)}${DIM}${emptyChar.repeat(empty)}${RESET}`;
 }
 // --- Stacked "hamburger" usage bar -------------------------------------------
-// Each cell is an upper-half block (▀): its FOREGROUND paints the top half and
-// its BACKGROUND paints the bottom half. We use the top half for quota used and
-// the bottom half for time elapsed in the window, so a single text row encodes
-// two stacked progress bars. 256-color palette (tuned for a dark terminal).
+// Each cell is a lower-half block (▄): its BACKGROUND paints the top half and
+// its FOREGROUND paints the bottom half. We use the top half (background) for
+// quota used and the bottom half (foreground glyph) for time elapsed, so a
+// single text row encodes two stacked progress bars. Painting the top half via
+// the cell background — which always fills flush to the cell's top edge — avoids
+// a phantom strip some terminals/fonts render above an upper-half block (▀) when
+// the glyph is drawn shifted down. 256-color palette (tuned for a dark terminal).
 const STACK_TIME_256 = 31; // teal/blue — time elapsed (bottom half)
 const STACK_EMPTY_TOP_256 = 238; // dim track — unused quota (top half)
 const STACK_EMPTY_BOT_256 = 236; // dim track — time not yet elapsed (bottom half)
@@ -147,9 +150,10 @@ function stackUsageColor256(percent) {
 }
 /**
  * A single-row stacked bar: top half = `usagePct` (green → amber → orange → red),
- * bottom half = `timePct` (teal). Built from ▀ cells whose fg/bg encode the two
- * halves. When the colored top extends past the teal bottom, quota is being
- * spent faster than the window's clock is ticking.
+ * bottom half = `timePct` (teal). Built from ▄ cells whose bg/fg encode the two
+ * halves (top = background, bottom = foreground glyph). When the colored top
+ * extends past the teal bottom, quota is being spent faster than the window's
+ * clock is ticking.
  */
 export function stackedBar(usagePct, timePct, width = 10) {
     const w = Number.isFinite(width) ? Math.max(0, Math.round(width)) : 0;
@@ -160,9 +164,11 @@ export function stackedBar(usagePct, timePct, width = 10) {
     const topColor = stackUsageColor256(u);
     let out = '';
     for (let i = 0; i < w; i += 1) {
-        const fg = i < uFill ? topColor : STACK_EMPTY_TOP_256;
-        const bg = i < tFill ? STACK_TIME_256 : STACK_EMPTY_BOT_256;
-        out += `\x1b[38;5;${fg}m\x1b[48;5;${bg}m▀`;
+        // top half = quota → cell background (flush to the top edge);
+        // bottom half = time elapsed → ▄ foreground glyph.
+        const top = i < uFill ? topColor : STACK_EMPTY_TOP_256;
+        const bottom = i < tFill ? STACK_TIME_256 : STACK_EMPTY_BOT_256;
+        out += `\x1b[38;5;${bottom}m\x1b[48;5;${top}m▄`;
     }
     return `${out}${RESET}`;
 }
