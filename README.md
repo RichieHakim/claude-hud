@@ -1,3 +1,16 @@
+<!-- ───────────────────────────── FORK NOTE ───────────────────────────── -->
+> ## 🍔 This fork (`RichieHakim/claude-hud`)
+>
+> Fork of [`jarrodwatts/claude-hud`](https://github.com/jarrodwatts/claude-hud) (based on **v0.3.0**) with **one addition: a stacked "hamburger" usage bar.**
+>
+> Each usage window (5h, Weekly) renders as a single row where the **top half = quota used** (green → amber → orange → red) and the **bottom half = time elapsed** in that window (teal). When the colored top sticks out past the teal bottom, you're spending quota faster than the clock — pace down.
+>
+> Enable it with `"usageStackedBar": true` in `~/.claude/plugins/claude-hud/config.json`. Install/setup on a new machine: see **[PORTING.md](PORTING.md)**.
+>
+> _Everything below is upstream's README, unchanged._
+
+---
+
 # Claude HUD
 
 A Claude Code plugin that shows what's happening — context usage, active tools, running agents, and todo progress. Always visible below your input.
