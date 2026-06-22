@@ -165,3 +165,41 @@ export function coloredBar(
   const emptyChar = colors?.barEmpty ?? '░';
   return `${color}${filledChar.repeat(filled)}${DIM}${emptyChar.repeat(empty)}${RESET}`;
 }
+
+// --- Stacked "hamburger" usage bar -------------------------------------------
+// Each cell is an upper-half block (▀): its FOREGROUND paints the top half and
+// its BACKGROUND paints the bottom half. We use the top half for quota used and
+// the bottom half for time elapsed in the window, so a single text row encodes
+// two stacked progress bars. 256-color palette (tuned for a dark terminal).
+const STACK_TIME_256 = 31;       // teal/blue — time elapsed (bottom half)
+const STACK_EMPTY_TOP_256 = 238; // dim track — unused quota (top half)
+const STACK_EMPTY_BOT_256 = 236; // dim track — time not yet elapsed (bottom half)
+
+function stackUsageColor256(percent: number): number {
+  if (percent >= 90) return 196; // red
+  if (percent >= 70) return 208; // orange
+  if (percent >= 40) return 220; // amber
+  return 34;                     // green
+}
+
+/**
+ * A single-row stacked bar: top half = `usagePct` (green → amber → orange → red),
+ * bottom half = `timePct` (teal). Built from ▀ cells whose fg/bg encode the two
+ * halves. When the colored top extends past the teal bottom, quota is being
+ * spent faster than the window's clock is ticking.
+ */
+export function stackedBar(usagePct: number, timePct: number, width: number = 10): string {
+  const w = Number.isFinite(width) ? Math.max(0, Math.round(width)) : 0;
+  const u = Number.isFinite(usagePct) ? Math.min(100, Math.max(0, usagePct)) : 0;
+  const tm = Number.isFinite(timePct) ? Math.min(100, Math.max(0, timePct)) : 0;
+  const uFill = Math.round((u / 100) * w);
+  const tFill = Math.round((tm / 100) * w);
+  const topColor = stackUsageColor256(u);
+  let out = '';
+  for (let i = 0; i < w; i += 1) {
+    const fg = i < uFill ? topColor : STACK_EMPTY_TOP_256;
+    const bg = i < tFill ? STACK_TIME_256 : STACK_EMPTY_BOT_256;
+    out += `\x1b[38;5;${fg}m\x1b[48;5;${bg}m▀`;
+  }
+  return `${out}${RESET}`;
+}

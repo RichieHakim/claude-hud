@@ -123,6 +123,7 @@ export interface HudConfig {
     showUsage: boolean;
     usageValue: UsageValueMode;
     usageBarEnabled: boolean;
+    usageStackedBar: boolean;
     showResetLabel: boolean;
     usageCompact: boolean;
     showTools: boolean;
@@ -211,6 +212,7 @@ export const DEFAULT_CONFIG: HudConfig = {
     showUsage: true,
     usageValue: 'percent',
     usageBarEnabled: true,
+    usageStackedBar: false,
     showResetLabel: true,
     usageCompact: false,
     showTools: false,
@@ -596,6 +598,9 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     usageBarEnabled: typeof migrated.display?.usageBarEnabled === 'boolean'
       ? migrated.display.usageBarEnabled
       : DEFAULT_CONFIG.display.usageBarEnabled,
+    usageStackedBar: typeof migrated.display?.usageStackedBar === 'boolean'
+      ? migrated.display.usageStackedBar
+      : DEFAULT_CONFIG.display.usageStackedBar,
     showResetLabel: typeof migrated.display?.showResetLabel === 'boolean'
       ? migrated.display.showResetLabel
       : DEFAULT_CONFIG.display.showResetLabel,

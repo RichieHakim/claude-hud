@@ -55,6 +55,7 @@ export const DEFAULT_CONFIG = {
         showUsage: true,
         usageValue: 'percent',
         usageBarEnabled: true,
+        usageStackedBar: false,
         showResetLabel: true,
         usageCompact: false,
         showTools: false,
@@ -396,6 +397,9 @@ export function mergeConfig(userConfig) {
         usageBarEnabled: typeof migrated.display?.usageBarEnabled === 'boolean'
             ? migrated.display.usageBarEnabled
             : DEFAULT_CONFIG.display.usageBarEnabled,
+        usageStackedBar: typeof migrated.display?.usageStackedBar === 'boolean'
+            ? migrated.display.usageStackedBar
+            : DEFAULT_CONFIG.display.usageStackedBar,
         showResetLabel: typeof migrated.display?.showResetLabel === 'boolean'
             ? migrated.display.showResetLabel
             : DEFAULT_CONFIG.display.showResetLabel,

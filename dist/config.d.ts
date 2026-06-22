@@ -68,6 +68,7 @@ export interface HudConfig {
         showUsage: boolean;
         usageValue: UsageValueMode;
         usageBarEnabled: boolean;
+        usageStackedBar: boolean;
         showResetLabel: boolean;
         usageCompact: boolean;
         showTools: boolean;

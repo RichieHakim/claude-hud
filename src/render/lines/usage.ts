@@ -2,7 +2,7 @@ import type { RenderContext } from "../../types.js";
 import { isLimitReached } from "../../types.js";
 import type { MessageKey } from "../../i18n/types.js";
 import { shouldHideUsage } from "../../stdin.js";
-import { critical, label, getQuotaColor, quotaBar, RESET } from "../colors.js";
+import { critical, label, getQuotaColor, quotaBar, stackedBar, RESET } from "../colors.js";
 import { getAdaptiveBarWidth } from "../../utils/terminal.js";
 import { t } from "../../i18n/index.js";
 import { progressLabel } from "./label-align.js";
@@ -89,6 +89,7 @@ export function renderUsageLine(
   }
 
   const usageBarEnabled = display?.usageBarEnabled ?? true;
+  const usageStacked = display?.usageStackedBar ?? false;
   const barWidth = getAdaptiveBarWidth();
 
   if (fiveHour === null && sevenDay !== null) {
@@ -100,6 +101,7 @@ export function renderUsageLine(
       windowMs: SEVEN_DAY_WINDOW_MS,
       colors,
       usageBarEnabled,
+      usageStacked,
       barWidth,
       timeFormat,
       showResetLabel,
@@ -117,6 +119,7 @@ export function renderUsageLine(
     windowMs: FIVE_HOUR_WINDOW_MS,
     colors,
     usageBarEnabled,
+    usageStacked,
     barWidth,
     timeFormat,
     showResetLabel,
@@ -132,6 +135,7 @@ export function renderUsageLine(
       windowMs: SEVEN_DAY_WINDOW_MS,
       colors,
       usageBarEnabled,
+      usageStacked,
       barWidth,
       timeFormat,
       showResetLabel,
@@ -187,6 +191,7 @@ function formatUsageWindowPart({
   windowMs,
   colors,
   usageBarEnabled,
+  usageStacked,
   barWidth,
   timeFormat = 'relative',
   showResetLabel,
@@ -201,6 +206,7 @@ function formatUsageWindowPart({
   windowMs: number;
   colors?: RenderContext["config"]["colors"];
   usageBarEnabled: boolean;
+  usageStacked: boolean;
   barWidth: number;
   timeFormat?: TimeFormatMode;
   showResetLabel: boolean;
@@ -223,9 +229,16 @@ function formatUsageWindowPart({
     : "";
 
   if (usageBarEnabled) {
+    // Stacked "hamburger" bar: top half = quota used, bottom half = time elapsed
+    // in the window. Falls back to the flat quota bar when stacked mode is off or
+    // the elapsed fraction can't be derived (no reset time).
+    const elapsed = usageStacked ? elapsedWindowPercent(resetAt, windowMs) : null;
+    const bar = elapsed !== null
+      ? stackedBar(percent ?? 0, elapsed, barWidth)
+      : quotaBar(percent ?? 0, barWidth, colors);
     const body = resetSuffix
-      ? `${quotaBar(percent ?? 0, barWidth, colors)} ${usageDisplay} ${resetSuffix}`
-      : `${quotaBar(percent ?? 0, barWidth, colors)} ${usageDisplay}`;
+      ? `${bar} ${usageDisplay} ${resetSuffix}`
+      : `${bar} ${usageDisplay}`;
     return forceLabel ? `${styledLabel} ${body}` : body;
   }
 
@@ -280,13 +293,24 @@ function formatWindowTime(
   return formatResetTime(resetAt, timeFormat);
 }
 
+/**
+ * Numeric percentage of a usage window already elapsed (0–100), or null when the
+ * reset time is unknown. The window started `windowMs` before it resets. Used as
+ * the bottom ("time") half of the stacked usage bar.
+ */
+function elapsedWindowPercent(resetAt: Date | null, windowMs: number): number | null {
+  if (!resetAt || !Number.isFinite(windowMs) || windowMs <= 0) {
+    return null;
+  }
+  const windowStart = resetAt.getTime() - windowMs;
+  const pct = ((Date.now() - windowStart) / windowMs) * 100;
+  return Math.max(0, Math.min(100, pct));
+}
+
 function formatElapsedWindow(resetAt: Date | null, windowMs: number): string {
-  if (!resetAt) {
+  const pct = elapsedWindowPercent(resetAt, windowMs);
+  if (pct === null) {
     return '';
   }
-
-  const windowStart = resetAt.getTime() - windowMs;
-  const rawElapsed = ((Date.now() - windowStart) / windowMs) * 100;
-  const elapsed = Math.max(0, Math.min(100, Math.round(rawElapsed)));
-  return `${elapsed}% elapsed`;
+  return `${Math.round(pct)}% elapsed`;
 }

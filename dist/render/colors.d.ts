@@ -23,4 +23,11 @@ export declare function getContextColor(percent: number, colors?: Partial<HudCol
 export declare function getQuotaColor(percent: number, colors?: Partial<HudColorOverrides>): string;
 export declare function quotaBar(percent: number, width?: number, colors?: Partial<HudColorOverrides>): string;
 export declare function coloredBar(percent: number, width?: number, colors?: Partial<HudColorOverrides>, thresholds?: ContextThresholds): string;
+/**
+ * A single-row stacked bar: top half = `usagePct` (green → amber → orange → red),
+ * bottom half = `timePct` (teal). Built from ▀ cells whose fg/bg encode the two
+ * halves. When the colored top extends past the teal bottom, quota is being
+ * spent faster than the window's clock is ticking.
+ */
+export declare function stackedBar(usagePct: number, timePct: number, width?: number): string;
 //# sourceMappingURL=colors.d.ts.map
